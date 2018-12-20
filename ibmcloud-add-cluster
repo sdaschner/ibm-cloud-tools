@@ -1,0 +1,39 @@
+#!/bin/bash
+
+if [[ "$1" == "" ]]; then
+  echo "Usage: ${0##*/} <cluster-name>"; exit 2
+fi
+
+set -euo pipefail
+
+cluster=$1
+context=iks-$cluster
+
+ibmcloud cs cluster-config $cluster
+infoJson=$(ibmcloud cs cluster-get $cluster --json)
+
+server=$(echo $infoJson | jq -r '.serverURL')
+certAuthFile=$(ls ~/.bluemix/plugins/container-service/clusters/${cluster}/*.pem)
+clusterConfigYaml=$(ls ~/.bluemix/plugins/container-service/clusters/${cluster}/*.yml)
+
+authProvider=$(yq -r '.users[0].user."auth-provider".name' $clusterConfigYaml)
+authProvider=$(yq -r '.users[0].user."auth-provider".name' $clusterConfigYaml)
+idpIssuerURL=$(yq -r '.users[0].user."auth-provider".config."idp-issuer-url"' $clusterConfigYaml)
+clientId=$(yq -r '.users[0].user."auth-provider".config."client-id"' $clusterConfigYaml)
+clientSecret=$(yq -r '.users[0].user."auth-provider".config."client-secret"' $clusterConfigYaml)
+idToken=$(yq -r '.users[0].user."auth-provider".config."id-token"' $clusterConfigYaml)
+refreshToken=$(yq -r '.users[0].user."auth-provider".config."refresh-token"' $clusterConfigYaml)
+
+kubectl config set-cluster $context --server=$server --certificate-authority=$certAuthFile
+kubectl config set-context $context --cluster=$context
+
+kubectl config set-credentials $context \
+   --auth-provider=$authProvider \
+   --auth-provider-arg=idp-issuer-url=$idpIssuerURL \
+   --auth-provider-arg=client-id=$clientId \
+   --auth-provider-arg=client-secret=$clientSecret \
+   --auth-provider-arg=refresh-token=$refreshToken \
+   --auth-provider-arg=id-token=$idToken
+
+kubectl config set-context $context --user=$context --namespace=default
+kubectl config use-context $context
