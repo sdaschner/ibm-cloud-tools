@@ -5,7 +5,7 @@ These are targeted for my personal usage.
 I'm not a CLI / Bash expert, so please don't judge the scripts too hard :-)
 
 All scripts are meant to serve as examples, as inspiration what's possible in the command line.
-Any issues, recommendations, or feedback is highly welcome!
+Any issues, recommendations, or feedback are highly welcome!
 
 
 == Kubectl scripts
