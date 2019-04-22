@@ -34,6 +34,7 @@ This script is idempotent and can be used to refresh the cluster access token.
 === Manually refresh cluster authentication
 
 In order to refresh the used client secrets without using the `ibmcloud` CLI, we can also download the cluster configuration manually and add them via `ibmcloud-add-cluster -f <access-zip-file>`
+This can be helpful if the `ibmcloud` CLI endpoint is not available but the cluster endpoints are.
 
 In order to do that, you can download the cluster config file manually, under https://cloud.ibm.com/kubernetes/clusters[Clusters^] -> "`Access`" -> "`download`" and provide it to the script using the `-f` flag.
 
