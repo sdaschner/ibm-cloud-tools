@@ -4,20 +4,38 @@ Scripts & everything related to IBM Cloud.
 These are targeted for my personal usage.
 I'm not a CLI / Bash expert, so please don't judge the scripts too hard :-)
 
+All scripts are meant to serve as examples, as inspiration what's possible in the command line.
+Any issues, recommendations, or feedback is highly welcome!
+
 
 == Add IKS cluster to kubectl contexts
 
 `ibmcloud-add-cluster` adds a created IKS cluster to the local kube config (usually under `~/.kube/config`).
+
+Requires `yq` being installed.
+
+After the cluster has been added, it's listed under `kubectl config get-contexts` and already active, that is, all subsequent `kubectl` commands will connect against that IKS cluster.
+The context can be switched using `kubectl config use-context <context-name>`.
 
 
 == Install Istio
 
 `ibmcloud-install-istio` batch-installs Istio to a Kubernetes cluster, including the following Helm features / flags: `tracing.enabled`, `grafana.enabled`, `kiali.enabled`.
 
-Requires `helm` (without Tiller), and an Istio release repository being checked-out under `~/workspaces/oss/istio-1.0.0/`.
-Please see and modify the script.
+Requires `helm` (without Tiller), and an Istio release repository being checked-out under, e.g. in version `1.1.1`.
+Please see and modify the script accordingly.
 
 
 == Install NGINX ingress
 
 `ibmcloud-install-nginx`; currently in progress.
+
+
+== Kubectl scripts
+
+The folder `kubectl/` contains a few scripts to forward Istio component ports, gather information, and delete resources.
+
+
+== Aliases
+
+`aliases` contains a few of the aliases I personally use for `ibmcloud`, `kubectl`, and `istioctl`.
