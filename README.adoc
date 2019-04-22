@@ -42,7 +42,7 @@ This option will extract the access files under `.bluemix/plugins/container-serv
 
 == Install Istio
 
-`ibmcloud-install-istio` batch-installs Istio to a Kubernetes cluster, including the following Helm features / flags: `tracing.enabled`, `grafana.enabled`, `kiali.enabled`.
+`ibmcloud-install-istio` batch-installs Istio to a Kubernetes cluster, including the following Helm features / flags: `tracing.enabled`, `grafana.enabled`, `kiali.enabled`, `kiali.createDemoSecret`, and 100% `pilot.traceSampling`.
 
 Requires `helm` (without Tiller), and an Istio release repository being checked-out under, e.g. in version `1.1.1`.
 Please see and modify the script accordingly.
