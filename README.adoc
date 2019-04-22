@@ -10,12 +10,23 @@ Any issues, recommendations, or feedback is highly welcome!
 
 == Add IKS cluster to kubectl contexts
 
-`ibmcloud-add-cluster` adds a created IKS cluster to the local kube config (usually under `~/.kube/config`).
-
+`ibmcloud-add-cluster <cluster-name>` adds a created IKS cluster to the local kube config (usually under `~/.kube/config`).
 Requires `yq` being installed.
+
+The script will use `ibmcloud` to acquire information about the provided cluster, download the access files, and add the cluster to the local kube config.
 
 After the cluster has been added, it's listed under `kubectl config get-contexts` and already active, that is, all subsequent `kubectl` commands will connect against that IKS cluster.
 The context can be switched using `kubectl config use-context <context-name>`.
+
+This script is idempotent and can be used to refresh the cluster access token.
+
+=== Manually refresh cluster authentication
+
+In order to refresh the used client secrets without using the `ibmcloud` CLI, we can also download the cluster configuration manually and add them via `ibmcloud-add-cluster -f <access-zip-file>`
+
+In order to do that, you can download the cluster config file manually, under https://cloud.ibm.com/kubernetes/clusters[Clusters^] -> "`Access`" -> "`download`" and provide it to the script using the `-f` flag.
+
+This option will extract the access files under `.bluemix/plugins/container-service/clusters/` (the default path), and add the required kube config entries.
 
 
 == Install Istio
