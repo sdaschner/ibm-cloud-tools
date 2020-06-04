@@ -1,0 +1,151 @@
+= IBM Cloud access
+
+== Registering IBM Cloud Account
+
+Register for an https://ibm.biz/cloud-reg-istio-ws[IBM Cloud account^].
+
+Fill in the registration form and follow the link in the validation email when it arrives.
+
+Then you can https://ibm.biz/cloud-login-istio-ws[Login into IBM Cloud^] using the account credentials you have registered.
+
+NOTE: IBM Cloud offers a Free Kubernetes cluster type that will run for 30 days at no costs.
+You can use this type once you have entered your credit card or a corresponding promo code.
+
+
+== IBM Cloud CLI
+
+We log into the IBM Cloud CLI tool: `ibmcloud login`.
+If you have a federated account, include the `--sso` flag: `ibmcloud login --sso`.
+
+Create an API key to access the IBM Cloud CLI more conveniently.
+
+----
+ibmcloud iam api-key-create cloud-native \
+  -d cloud-native \
+  --file cloud-native.json
+cat cloud-native.json
+----
+
+Write down the API key under the `apikey` property.
+
+Now we set the locale and unset any configuration that might exist if you have used the CLI in the past:
+
+----
+ibmcloud config --locale en_US
+ibmcloud config --check-version=false
+ibmcloud api --unset
+ibmcloud api https://cloud.ibm.com
+ibmcloud login --apikey <yourkey>
+----
+
+To verify that the plugins are installed properly, run `ibmcloud plugin list`.
+The Container Service plugin and Registry plugin are displayed as `container-service/kubernetes-service` and `container-registry`.
+
+
+== IBM Kubernetes Service
+
+Now we can create a Kubernetes cluster (free or standard) using the https://ibm.biz/create-cluster-istio-ws[Cloud Console^] or CLI.
+A free cluster is sufficient to try things out but for serious deployments create a standard cluster with your desired configuration.
+
+If you want to use the CLI continue with one of the following:
+
+For a Free cluster use the following command:
+
+----
+ibmcloud ks cluster create classic  \
+  --name cloud-native
+----
+
+For a standard cluster, in standard setting with 3 workers and in zone `Frankfurt 02`, use the following command:
+
+----
+ibmcloud ks cluster create classic \
+  --name cloud-native \
+  --zone fra02 \
+  --flavor b3c.4x16 \
+  --workers 3
+----
+
+
+[NOTE]
+====================
+If the command fails because you have existing VLANs in that zone, you need to specify the VLANs in your command:
+
+----
+ibmcloud ks vlans --zone fra02
+ibmcloud ks cluster create classic \
+  --name cloud-native \
+  --zone fra02 \
+  --flavor b3c.4x16 \
+  --workers 3 \
+  --private-vlan <vlan> \
+  --public-vlan <vlan>
+----
+====================
+
+
+=== Accessing the cluster
+
+Now, we'll see how to set the context to work with our clusters by using the `kubectl` CLI, access the Kubernetes dashboard, and gather basic information about our cluster.
+
+List the available clusters: `ibmcloud ks clusters`.
+This command should now show your cluster which is being created.
+
+
+After the cluster is up-and-running, download the configuration file and certificates for the cluster using the `cluster config` command:
+
+----
+ibmcloud ks cluster config --cluster cloud-native
+----
+
+Get basic information about the cluster and its worker nodes.
+This information can help you managing the cluster and troubleshoot issues.
+
+Get the details of your cluster: `ibmcloud ks cluster get --cluster cloud-native`
+
+Verify the nodes in the cluster:
+
+----
+ibmcloud ks workers --cluster cloud-native
+kubectl get nodes
+----
+
+View the currently available services, deployments, and pods:
+
+----
+kubectl get svc,deploy,po --all-namespaces
+----
+
+=== Container Registry
+
+In order to build and distribute Docker images, we need a Docker registry.
+We can use the IBM Container Registry which can be accessed right away from our Kubernetes cluster.
+
+We log into the Container Registry service via the `ibmcloud` CLI and obtain the information about our registry:
+
+----
+ibmcloud cr login
+ibmcloud cr region
+You are targeting region 'eu-central', the registry is 'de.icr.io'.
+----
+
+We can use the CLI to create a unique namespace in the Container Registry service (`cr`):
+
+----
+ibmcloud cr namespace-add <your-namespace>
+ibmcloud cr namespaces
+----
+
+In order to test our new registry namespace, we can pull a public image, re-tag it for our own registry, for our region, and push it:
+
+----
+docker pull hello-world
+docker tag hello-world de.icr.io/<your-namespace>/hello-world:1
+docker push de.icr.io/<your-namespace>/hello-world:1
+----
+
+Let's see whether our image is now in the private registry:
+
+----
+ibmcloud cr images
+----

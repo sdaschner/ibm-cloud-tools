@@ -1,54 +1,22 @@
 = K8s &amp; IBM Cloud tools
 
 Scripts &amp; everything related to Kubernetes, Istio &amp; IBM Cloud.
-These are targeted for my personal usage.
-I'm not a CLI / Bash expert, so please don't judge the scripts too hard :-)
+
+== IBM Cloud Account
+
+Have a look at https://github.com/sdaschner/ibm-cloud-tools/tree/master/cloud-access.adoc[cloud-access.adoc^] how to get access to the IBM Cloud and how to create your Kubernetes cluster.
+
+
+== Scripts
+
+The folder `kubectl/` contains a few scripts to forward Istio component ports, gather information, and delete resources.
+
+The folder https://github.com/sdaschner/ibm-cloud-tools/tree/master/ibmcloud-scripts[ibmcloud-scripts] contains ``ibmcloud``-specific scripts to quickly connect to clusters, or manually install and deinstall Istio.
 
 All scripts are meant to serve as examples, as inspiration what's possible in the command line.
 Any issues, recommendations, or feedback are highly welcome!
 
 
-== Kubectl scripts
-
-The folder `kubectl/` contains a few scripts to forward Istio component ports, gather information, and delete resources.
-
-
 == Aliases
 
 `aliases` contains a few of the aliases I personally use for `ibmcloud`, `kubectl`, and `istioctl`.
-
-
-== Add IKS cluster to kubectl contexts
-
-`ibmcloud-add-cluster <cluster-name>` adds a created IKS cluster to the local kube config (usually under `~/.kube/config`).
-Requires `yq` being installed.
-
-The script will use `ibmcloud` to acquire information about the provided cluster, download the access files, and add the cluster to the local kube config.
-
-After the cluster has been added, it's listed under `kubectl config get-contexts` and already active, that is, all subsequent `kubectl` commands will connect against that IKS cluster.
-The context can be switched using `kubectl config use-context <context-name>`.
-
-This script is idempotent and can be used to refresh the cluster access token.
-
-
-=== Manually refresh cluster authentication
-
-In order to refresh the used client secrets without using the `ibmcloud` CLI, we can also download the cluster configuration manually and add them via `ibmcloud-add-cluster -f <access-zip-file>`.
-This can be helpful if the `ibmcloud` CLI endpoint is not available but the cluster endpoints are.
-
-In order to do that, you can download the cluster config file manually, under https://cloud.ibm.com/kubernetes/clusters[Clusters^] -> "`Access`" -> "`download`" and provide it to the script using the `-f` flag.
-
-This option will extract the access files under `.bluemix/plugins/container-service/clusters/` (the default path), and add the required kube config entries.
-
-
-== Install Istio
-
-`ibmcloud-install-istio` batch-installs Istio to a Kubernetes cluster, including the following Helm features / flags: `tracing.enabled`, `grafana.enabled`, `kiali.enabled`, `kiali.createDemoSecret`, and 100% `pilot.traceSampling`.
-
-Requires `helm` (without Tiller), and an Istio release repository being checked-out under, e.g. in version `1.1.1`.
-Please see and modify the script accordingly.
-
-
-== Install NGINX ingress
-
-`ibmcloud-install-nginx`; currently in progress.

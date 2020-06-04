@@ -1,0 +1,5 @@
+#!/bin/bash
+set -euo pipefail
+
+istioctl manifest apply --set profile=demo
+kubectl label namespace default istio-injection=enabled --overwrite
